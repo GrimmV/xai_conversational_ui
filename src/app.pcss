@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer base {
+
+  :root  {
+    --background: 183 100% 95%;
+    --foreground: 183 5% 0%;
+    --card: 183 50% 90%;
+    --card-foreground: 183 5% 10%;
+    --popover: 183 100% 95%;
+    --popover-foreground: 183 100% 0%;
+    --primary: 183 61% 26%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 183 30% 70%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 145 30% 85%;
+    --muted-foreground: 183 5% 35%;
+    --accent: 145 30% 80%;
+    --accent-foreground: 183 5% 10%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 183 5% 90%;
+    --positive: 120 73% 75%;
+    --neutral: 60 100% 50%;
+    --negative: 0 100% 90%;
+    --border: 183 30% 50%;
+    --input: 183 30% 18%;
+    --ring: 183 61% 26%;
+    --radius: 0.5rem;
+  }
+  .dark  {
+    --background: 183 50% 5%;
+    --foreground: 183 5% 90%;
+    --card: 183 50% 0%;
+    --card-foreground: 183 5% 90%;
+    --popover: 183 50% 5%;
+    --popover-foreground: 183 5% 90%;
+    --primary: 183 61% 26%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 183 30% 90%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 145 30% 15%;
+    --muted-foreground: 183 5% 60%;
+    --accent: 145 30% 20%;
+    --accent-foreground: 183 5% 90%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 183 5% 90%;
+    --positive: 120 73% 35%;
+    --neutral: 60 87% 30%;
+    --negative: 0 100% 60%;
+    --border: 183 30% 18%;
+    --input: 183 30% 18%;
+    --ring: 183 61% 26%;
+    --radius: 0.5rem;
+  }  
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1 {
+    @apply scroll-m-20 m-1 text-4xl font-extrabold tracking-tight lg:text-5xl
+  }
+  h2 {
+    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0 mb-2
+  }
+  h3 {
+    @apply scroll-m-20 text-2xl font-semibold tracking-tight
+  }
+  h4 {
+    @apply scroll-m-20 text-xl font-semibold tracking-tight
+  }
+  blockquote {
+    @apply mt-6 border-l-2 pl-6 italic
+  }
+  ul {
+    @apply my-6 ml-6 list-disc [&>li]:mt-2
+  }
+}
