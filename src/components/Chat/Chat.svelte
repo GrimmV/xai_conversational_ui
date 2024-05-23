@@ -113,10 +113,14 @@
     // ]);
     sendSystemMessage("Here is the learning curve for the training set:", [
       {
-        component: "shapGlobalImportance",
-        title: "Shap Global Importance",
-        // dataParams: {types: ["test"]},
+        component: "predictionProbabilities",
+        title: "Prediction Probabilities",
       },
+      {
+        component: "trustscore",
+        title: "Trustscores!",
+      },
+      "flex mx-2"
     ]);
   }
   

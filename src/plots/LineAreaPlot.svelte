@@ -4,7 +4,6 @@
   import Line from "./_components/Line.svelte";
   import Area from "./_components/Area.svelte";
   import SingleBarMarker from "./_components/SingleBarMarker.svelte";
-  import TabNav from "../navs/TabNav.svelte";
 
   export let data;
   export let domain;
@@ -12,9 +11,6 @@
   export let xKey;
   export let yKey;
   export let dataValue;
-  export let variableDataValue;
-
-  export let choice = "smoothed"
 
   data.forEach((d) => {
     d[yKey] = +d[yKey];
@@ -36,12 +32,9 @@
       <Line />
       <Area flipAtZero/>
       <SingleBarMarker {dataValue} width={0.5} height="100%" />
-      <SingleBarMarker dataValue={variableDataValue} fill="green" width={0.5} height="100%" />
     </ScaledSvg>
   </LayerCake>
 </div>
-
-<TabNav options={["real", "smoothed"]} bind:state={choice}/>
 
 <style>
   /*

@@ -12,7 +12,6 @@
   export let lowerBound;
   export let upperBound
   export let dataValue;
-  export let variableDataValue;
 
 </script>
 
@@ -32,7 +31,6 @@
     <ScaledSvg>
       <SingleBar/>
       <SingleBarMarker {dataValue}/>
-      <SingleBarMarker dataValue={variableDataValue} fill="green"/>
     </ScaledSvg>
   </LayerCake>
 </div>
