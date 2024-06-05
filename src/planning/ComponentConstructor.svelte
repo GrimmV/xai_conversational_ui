@@ -59,7 +59,7 @@
     return data.allDensity;
   };
 
-  function transformDensityData(featureKey) {
+  function transformDensityData(featureKey, activeClass) {
     const dataDictionary = {};
 
     const densityData = data.density;
@@ -78,7 +78,7 @@
       });
     }
 
-    return dataDictionary;
+    return dataDictionary[activeClass];
   }
   const getAnchorBound = (feature, key = "lower_bound") => {
     const anchor_tmp = data.singleAnchor.anchor.find(
@@ -118,68 +118,70 @@
   export let dataParams = {};
 </script>
 
-{#if component === "textbox"}
-  <Textbox {dataParams} />
-{:else if component === "predConfMatrix"}
-  <PredConfusionPlot
-    data={getPredConfusionMatrices(dataParams)}
-    props={{ xKey: "actual", yKey: "predicted", zKey: "count", title: title }}
-  />
-{:else if component === "corrMatrix"}
-  <PredConfusionPlot
-    data={getFeatureCorrelation()}
-    props={{ xKey: "f1", yKey: "f2", zKey: "correlation", title: title }}
-    xLabelRotation={45}
-  />
-{:else if component === "learningCurve"}
-  <MultiLinePlot data={getLearningCurves(dataParams)} {title} />
-{:else if component === "shapGlobalImportance"}
-  <Column data={getShapGlobalImportance()} {title} />
-{:else if component === "statistics"}
-  <FeatureStatistics
-    data={getStatistics()}
-    feature={dataParams.feature}
-    activeClass={dataParams.activeClass}
-  />
-{:else if component === "featureDistribution"}
-  <HistPlot
-    {title}
-    data={transformDensityData(dataParams.feature)[
-      dataParams.activeClass
-    ]}
-  />
-{:else if component === "interactionScatter"}
-  <Scatter
-    {title}
-    datapoints={getTestInteractions()}
-    xKey={dataParams.feature1}
-    yKey={dataParams.feature2}
-    state={dataParams.class}
-  />
-{:else if component === "datapointAndShapTable"}
-  <DatapointTableAndShap
-    datapoint={getDatapoint()}
-    shapValues={getSingleShap().find(
-      (v) => v.class === getPrediction().values.prediction
-    )}
-  />
-{:else if component === "predictionProbabilities"}
-  <ProgressBars prediction={getPrediction()} />
-{:else if component === "trustscore"}
-  <TrustScoreVisualization trustScoreData={getSingleTrustscore()} />
-{:else if component === "featureContext"}
-  <SingleFeaturePlot
-    feature={dataParams.feature}
-    lowerBound={getAnchorBound(dataParams.feature, "lower_bound")}
-    upperBound={getAnchorBound(dataParams.feature, "upper_bound")}
-    density={getAllDensity()}
-    classShaps={calcClassShaps(dataParams.activeClass)}
-    featureShap={calcFeatureShap(dataParams.feature, dataParams.activeClass)}
-    predictionIndexes={calcPredictionIndexes(dataParams.activeClass)}
-    dataValue={getDatapointValue(dataParams.feature)}
-    dataStats={getFeatureDataStats(dataParams.feature)}
-    showDistribution={dataParams.showDistribution}
-    showShapValue={dataParams.showShapValue}
-    showPartialDependence={dataParams.showPartialDependence}
-  />
-{/if}
+<div>
+  {#if component === "textbox"}
+    <Textbox {dataParams} />
+  {:else if component === "predConfMatrix"}
+    <PredConfusionPlot
+      data={getPredConfusionMatrices(dataParams)}
+      props={{ xKey: "actual", yKey: "predicted", zKey: "count", title: title }}
+    />
+  {:else if component === "corrMatrix"}
+    <PredConfusionPlot
+      data={getFeatureCorrelation()}
+      props={{ xKey: "f1", yKey: "f2", zKey: "correlation", title: title }}
+      xLabelRotation={45}
+    />
+  {:else if component === "learningCurve"}
+    <MultiLinePlot data={getLearningCurves(dataParams)} {title} />
+  {:else if component === "shapGlobalImportance"}
+    <Column data={getShapGlobalImportance()} {title} />
+  {:else if component === "statistics"}
+    <FeatureStatistics
+      data={getStatistics()}
+      feature={dataParams.feature}
+      activeClass={dataParams.activeClass}
+    />
+  {:else if component === "featureDistribution"}
+    <HistPlot
+      {title}
+      transformData={transformDensityData}
+      feature={dataParams.feature}
+      activeClass={dataParams.activeClass}
+    />
+  {:else if component === "interactionScatter"}
+    <Scatter
+      {title}
+      datapoints={getTestInteractions()}
+      xKey={dataParams.feature1}
+      yKey={dataParams.feature2}
+      state={dataParams.class}
+    />
+  {:else if component === "datapointAndShapTable"}
+    <DatapointTableAndShap
+      datapoint={getDatapoint()}
+      shapValues={getSingleShap().find(
+        (v) => v.class === getPrediction().values.prediction
+      )}
+    />
+  {:else if component === "predictionProbabilities"}
+    <ProgressBars prediction={getPrediction()} />
+  {:else if component === "trustscore"}
+    <TrustScoreVisualization trustScoreData={getSingleTrustscore()} />
+  {:else if component === "featureContext"}
+    <SingleFeaturePlot
+      feature={dataParams.feature}
+      calcAnchorBound={getAnchorBound}
+      density={getAllDensity()}
+      calcClassShaps={calcClassShaps}
+      calcFeatureShap={calcFeatureShap}
+      calcPredictionIndexes={calcPredictionIndexes}
+      calcDatapointValue={getDatapointValue}
+      calcFeatureDataStats={getFeatureDataStats}
+      activeClass={dataParams.activeClass}
+      showDistribution={dataParams.showDistribution}
+      showShapValue={dataParams.showShapValue}
+      showPartialDependence={dataParams.showPartialDependence}
+    />
+  {/if}
+</div>

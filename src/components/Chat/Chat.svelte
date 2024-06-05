@@ -2,7 +2,55 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import ChatMessage from "./ChatMessage.svelte";
-	import { tick } from 'svelte';
+  import { tick } from "svelte";
+  import { onMount } from 'svelte';
+  
+  let socket;
+
+  function sendRequest(message) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(message));
+    } else {
+      console.error('WebSocket is not open');
+    }
+  }
+
+  onMount(() => {
+    socket = new WebSocket('ws://localhost:8765');
+
+    socket.onopen = () => {
+      console.log('WebSocket connection opened');
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      const type = data.type
+      if (type === "status") {
+        sendSystemMessage(data.text, [], "", type)
+      } else if (type === "routing") {
+        sendSystemMessage(data.category, [], "", type, data.explanation)
+      } else if (type === "data_choice") {
+        sendSystemMessage(data.choice, [], "", type, data.explanation)
+      } else if (type === "response") {
+        sendSystemMessage(data.response, [], "", type, data.explanation)
+        sendSystemMessage(data.next, [], "", "next")
+      } else {
+        sendSystemMessage(data.text, [], "", "info")
+      }
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    return () => {
+      socket.close();
+    };
+  });
 
   let profilePicMe =
     "https://p0.pikist.com/photos/474/706/boy-portrait-outdoors-facial-men-s-young-t-shirt-hair-person-thumbnail.jpg";
@@ -19,6 +67,9 @@
         "Hey, I am your assistant to walk you through the decision process of the machine learning model for predicting the quality of wine based on chemical properties, such as alcohol concentration and density",
       timestamp: now,
       actor: "system",
+      type: "info",
+      prevActor: "",
+      explanation: ""
     },
     {
       messageId: 2,
@@ -27,7 +78,10 @@
       components: [
         { component: "textbox", dataParams: { text: "Understand the data" } },
         { component: "textbox", dataParams: { text: "Understand the model" } },
-        { component: "textbox", dataParams: { text: "Look into the prediction" } },
+        {
+          component: "textbox",
+          dataParams: { text: "Look into the prediction" },
+        },
         {
           component: "textbox",
           dataParams: { text: "Analyze the prediction context" },
@@ -36,34 +90,39 @@
       componentClass: "flex m-2",
       timestamp: now,
       actor: "system",
+      type: "info",
+      prevActor: "system",
+      explanation: ""
     },
     {
       messageId: 3,
       message: "What do you want to know or do?",
       timestamp: now,
       actor: "system",
+      type: "info",
+      prevActor: "system",
+      explanation: ""
     },
   ];
 
   let oldMessages = messages;
 
-
   let userMessage = "";
   let element;
-  
-  const scrollToBottom = async (node) => {
-    console.log(node.scrollHeight)
-    node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
-  }; 
 
-  $: if(messages.length !== oldMessages.length) {
-		handleScroll()
+  const scrollToBottom = async (node) => {
+    console.log(node.scrollHeight);
+    node.scroll({ top: node.scrollHeight, behavior: "smooth" });
+  };
+
+  $: if (messages.length !== oldMessages.length) {
+    handleScroll();
   }
 
   async function handleScroll() {
     await tick();
-    scrollToBottom(element)
-    oldMessages = messages
+    scrollToBottom(element);
+    oldMessages = messages;
   }
 
   function sendUserMessage() {
@@ -74,12 +133,19 @@
         message: userMessage,
         timestamp: Date.now(),
         actor: "user",
+        type: "",
+        prevActor: "",
+        explanation: ""
       },
     ];
+    const request = {
+      requestField: userMessage
+    }
+    sendRequest(request)
     userMessage = "";
   }
 
-  function sendSystemMessage(message, components = [], componentClass = "") {
+  function sendSystemMessage(message, components = [], componentClass = "", type = "info", explanation = "") {
     messages = [
       ...messages,
       {
@@ -89,68 +155,21 @@
         componentClass: componentClass,
         timestamp: Date.now(),
         actor: "system",
+        type: type,
+        prevActor: messages[messages.length - 1].actor,
+        explanation: explanation
       },
     ];
-  }
-
-  $: if (messages.length === 4) {
-    sendSystemMessage("\u2607 Chosen step: Understanding Data");
-  }
-  $: if (messages.length === 5) {
-    sendSystemMessage(
-      "Most features are rather uncorrelated. A relatively strong correlation occurs between residual sugar and density (+0.81)" +
-        " while a relatively strong negative correlation occurs between alcohol and density (-0.84)." +
-        " Do you want to see the detailed confusion matrix?"
-    );
-  }
-  $: if (messages.length === 7) {
-    // sendSystemMessage("Here is the detailed correlation matrix:", [
-    //   {
-    //     component: "corrMatrix",
-    //     title: "Feature Correlation",
-    //     dataParams: {},
-    //   },
-    // ]);
-    sendSystemMessage("Here is the learning curve for the training set:", [
-      {
-        component: "predictionProbabilities",
-        title: "Prediction Probabilities",
-      },
-      {
-        component: "trustscore",
-        title: "Trustscores!",
-      },
-      "flex mx-2"
-    ]);
-  }
-  
-  $: if (messages.length === 9) {
-    sendSystemMessage("\u2607 Chosen step: Understanding Model");
-  }
-  $: if (messages.length === 10) {
-    sendSystemMessage(
-      "Ok, no problem. Here are the confusion matrices between actual classes and the predictions by the model:",
-      [
-        {
-          component: "predConfMatrix",
-          title: "Train Confusion Matrix",
-          dataParams: { type: "train" },
-        },
-        {
-          component: "predConfMatrix",
-          title: "Test Confusion Matrix",
-          dataParams: { type: "test" },
-        },
-      ],
-      "flex mx-2"
-    );
   }
 </script>
 
 <div class="direct-chat direct-chat-danger">
   <div class="card-body">
-    <div class="direct-chat-messages overflow-auto relative" bind:this={element}>
-      {#each messages as message}
+    <div
+      class="direct-chat-messages overflow-auto relative"
+      bind:this={element}
+    >
+      {#each messages as message, i}
         <ChatMessage
           {profilePicMe}
           {profilePicChatPartner}
@@ -159,6 +178,10 @@
           componentsClass={message.componentClass}
           timestamp={message.timestamp}
           actor={message.actor}
+          prevActor={message.prevActor}
+          type={message.type}
+          explanation={message.explanation}
+          isLast={ i >= (messages.length-1)}
         />
       {/each}
     </div>

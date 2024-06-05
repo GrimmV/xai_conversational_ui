@@ -9,15 +9,24 @@
   import AxisY from "./_components/AxisY.percent-range.html.svelte";
 
   import calcThresholds from "./_modules/calcThresholds.js";
+  import TabNav from "../components/Navigation/TabNav.svelte";
+  import { allClasses, allFeatures } from "../config";
 
-  export let data;
+  export let transformData;
   export let domain = [0, null];
   export let title = "";
+  export let feature = "";
+  export let activeClass = "";
 
   const f = format(".2f");
 
   const xKey = ["x0", "x1"];
   const yKey = "length";
+
+  $: data = transformData(feature, activeClass);
+
+  let selectedFeature = feature;
+  let selectedClass = activeClass;
 
   let binCount = 60;
 
@@ -33,6 +42,18 @@
 {#if data.length > 0}
   <div class="flex flex-col items-center">
     <h3>{title}</h3>
+    <div class="flex gap-2">
+      <TabNav
+        options={allFeatures}
+        label="Focus Feature"
+        bind:selected={selectedFeature}
+      />
+      <TabNav
+        options={allClasses}
+        label="Focus Class"
+        bind:selected={selectedClass}
+      />
+    </div>
     <div class="chart-container">
       <LayerCake
         padding={{ top: 20, right: 5, bottom: 20, left: 30 }}

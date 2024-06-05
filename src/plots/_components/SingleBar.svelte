@@ -7,8 +7,8 @@
   export let innerFill = "blue";
   export let height = "30px";
 
-  let lowerBound = $data["lowerBound"];
-  let upperBound = $data["upperBound"];
+  $: lowerBound = $data["lowerBound"];
+  $: upperBound = $data["upperBound"];
 
 
   $: computeAnchorWidth = () => {

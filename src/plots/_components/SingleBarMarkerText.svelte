@@ -7,7 +7,7 @@
 </script>
 
 <div class="tick-mark w-full h-9">
-  <p style:left="{$xScale(dataValue)}%">{dataValue}</p>
+  <p style:left="{$xScale(dataValue)}%">{dataValue.toFixed(4)}</p>
 </div>
 
 <style>

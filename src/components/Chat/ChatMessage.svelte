@@ -1,6 +1,9 @@
 <script>
   import ComponentConstructor from "../../planning/ComponentConstructor.svelte";
 
+  import * as Popover from "$lib/components/ui/popover/index.js";
+  import Button from "$lib/components/ui/button/button.svelte";
+
   export let actor;
   export let profilePicChatPartner;
   export let profilePicMe;
@@ -8,50 +11,108 @@
   export let components = [];
   export let componentsClass = "";
   export let timestamp;
+  export let type;
+  export let prevActor;
+  export let explanation;
+  export let isLast;
 
   let sentByMe = actor === "user";
+  let isStatus = type === "status";
+  let isInfo = type === "status" || type === "info";
 </script>
 
 <div class="flex flex-col">
-  <div
-    class="direct-chat-msg min-w-min {sentByMe ? "self-end" : "self-start"}"
-    class:right={sentByMe}
-    class:left={!sentByMe}
-  >
-    <div class="direct-chat-infos clearfix flex flex-col">
-      <p class="{sentByMe ? "self-end" : "self-start"}">
-        {new Date(timestamp).toLocaleString([], {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })}
-      </p>
-    </div>
-    <img
-      class="direct-chat-img"
-      src={sentByMe == true ? profilePicMe : profilePicChatPartner}
-      alt="pic"
-    />
-    <div class="direct-chat-text">
-      <div class="d-flex">
-        <span class="mr-auto">{message}</span>
-        <div class={componentsClass}>
-          {#if Array.isArray(components)}
-            {#each components as component}
-              <ComponentConstructor
-                component={component.component}
-                title={component.title}
-                dataParams={component.dataParams}
-              />
-            {/each}
-          {/if}
+  {#if isStatus}
+    <div
+      class="min-w-min"
+    >
+      {#if actor !== prevActor}
+        <div class="direct-chat-infos clearfix flex flex-col">
+          <p class={sentByMe ? "self-end" : "self-start"}>
+            {new Date(timestamp).toLocaleString([], {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+          </p>
+        </div>
+        <img
+          class="direct-chat-img"
+          src={sentByMe == true ? profilePicMe : profilePicChatPartner}
+          alt="pic"
+        />
+      {/if}
+      <div class="w-fit m-auto p-2">
+        <div class="d-flex">
+          <span class="mr-auto font-semibold">{message}
+            {#if isLast}
+              <i class="fa-solid fa-spinner animate-spin"/>
+            {/if}
+          </span>
         </div>
       </div>
     </div>
-  </div>
+  {:else}
+    <div
+      class="direct-chat-msg min-w-min {sentByMe ? 'self-end' : 'self-start'}"
+      class:right={sentByMe}
+      class:left={!sentByMe}
+    >
+      {#if actor !== prevActor}
+        <div class="direct-chat-infos clearfix flex flex-col">
+          <p class={sentByMe ? "self-end" : "self-start"}>
+            {new Date(timestamp).toLocaleString([], {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+          </p>
+        </div>
+        <img
+          class="direct-chat-img"
+          src={sentByMe == true ? profilePicMe : profilePicChatPartner}
+          alt="pic"
+        />
+      {/if}
+      {#if isInfo}
+        <div class="direct-chat-text bg-accent">
+          <div class="d-flex">
+            <span class="mr-auto">{message}</span>
+          </div>
+        </div>
+      {:else}
+        <div class="direct-chat-text bg-secondary">
+          <div class="d-flex">
+            <div class="flex flex-col gap-y-2">
+              <span class="mr-auto">{message}</span>
+              {#if explanation}
+                <div class="flex items-center gap-x-2">
+                  <Popover.Root>
+                    <Popover.Trigger asChild let:builder>
+                      <Button builders={[builder]} class="w-fit"
+                        >Why?<i
+                          class="fa-solid fa-arrow-pointer ml-3"
+                        /></Button
+                      >
+                    </Popover.Trigger>
+                    <Popover.Content class="w-96" side="right" sideOffset={10}>
+                      <p>{explanation}</p>
+                    </Popover.Content>
+                  </Popover.Root>
+                </div>
+              {/if}
+            </div>
+          </div>
+        </div>
+      {/if}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -74,10 +135,10 @@
     border-radius: 5px;
     position: relative;
     padding: 5px 10px;
-    background: #d2d6de;
+    /* background: #d2d6de; */
     border: 1px solid #d2d6de;
     margin: 2px 0 5px 50px;
-    color: #444;
+    /* color: #444; */
     margin-right: 50px;
   }
   .direct-chat-text:after,

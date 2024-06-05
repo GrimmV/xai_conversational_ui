@@ -13,6 +13,9 @@
   export let upperBound
   export let dataValue;
 
+  $: console.log(lowerBound)
+  $: console.log(upperBound)
+
 </script>
 
 <div class="chart-container">
