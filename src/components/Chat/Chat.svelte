@@ -1,50 +1,51 @@
 <script>
   import Button from "$lib/components/ui/button/button.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+  import ChatComponent from "./ChatComponent.svelte";
   import ChatMessage from "./ChatMessage.svelte";
   import { tick } from "svelte";
-  import { onMount } from 'svelte';
-  
+  import { onMount } from "svelte";
+
   let socket;
 
   function sendRequest(message) {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(message));
     } else {
-      console.error('WebSocket is not open');
+      console.error("WebSocket is not open");
     }
   }
 
   onMount(() => {
-    socket = new WebSocket('ws://localhost:8765');
+    socket = new WebSocket("ws://localhost:8765");
 
     socket.onopen = () => {
-      console.log('WebSocket connection opened');
+      console.log("WebSocket connection opened");
     };
 
     socket.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      const type = data.type
+      const data = JSON.parse(event.data);
+      const type = data.type;
       if (type === "status") {
-        sendSystemMessage(data.text, [], "", type)
+        sendSystemMessage(data.text, [], "", type);
       } else if (type === "routing") {
-        sendSystemMessage(data.category, [], "", type, data.explanation)
+        sendSystemMessage(data.category, [], "", type, data.explanation);
       } else if (type === "data_choice") {
-        sendSystemMessage(data.choice, [], "", type, data.explanation)
+        sendSystemMessage(data.choice, [], "", type, data.explanation);
       } else if (type === "response") {
-        sendSystemMessage(data.response, [], "", type, data.explanation)
-        sendSystemMessage(data.next, [], "", "next")
+        sendSystemMessage(data.response, [], "", type, data.explanation);
+        sendSystemMessage(data.next, [], "", "next");
       } else {
-        sendSystemMessage(data.text, [], "", "info")
+        sendSystemMessage(data.text, [], "", "info");
       }
     };
 
     socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error("WebSocket error:", error);
     };
 
     socket.onclose = () => {
-      console.log('WebSocket connection closed');
+      console.log("WebSocket connection closed");
     };
 
     return () => {
@@ -69,12 +70,20 @@
       actor: "system",
       type: "info",
       prevActor: "",
-      explanation: ""
+      explanation: "",
     },
     {
       messageId: 2,
       message:
         "While you can ask me anything about the model behaviour and data, I recommend the following workflow: ",
+      timestamp: now,
+      actor: "system",
+      type: "info",
+      prevActor: "system",
+      explanation: "",
+    },
+    {
+      messageId: 3,
       components: [
         { component: "textbox", dataParams: { text: "Understand the data" } },
         { component: "textbox", dataParams: { text: "Understand the model" } },
@@ -90,18 +99,18 @@
       componentClass: "flex m-2",
       timestamp: now,
       actor: "system",
-      type: "info",
+      type: "component",
       prevActor: "system",
-      explanation: ""
+      explanation: "",
     },
     {
-      messageId: 3,
+      messageId: 4,
       message: "What do you want to know or do?",
       timestamp: now,
       actor: "system",
       type: "info",
       prevActor: "system",
-      explanation: ""
+      explanation: "",
     },
   ];
 
@@ -135,17 +144,28 @@
         actor: "user",
         type: "",
         prevActor: "",
-        explanation: ""
+        explanation: "",
       },
     ];
     const request = {
-      requestField: userMessage
-    }
-    sendRequest(request)
+      requestField: userMessage,
+    };
+    // sendRequest(request);
+    sendSystemMessage("", [
+      {
+        "component": "feature_relevance"
+      }
+    ], "", "component")
     userMessage = "";
   }
 
-  function sendSystemMessage(message, components = [], componentClass = "", type = "info", explanation = "") {
+  function sendSystemMessage(
+    message,
+    components = [],
+    componentClass = "",
+    type = "info",
+    explanation = ""
+  ) {
     messages = [
       ...messages,
       {
@@ -157,7 +177,7 @@
         actor: "system",
         type: type,
         prevActor: messages[messages.length - 1].actor,
-        explanation: explanation
+        explanation: explanation,
       },
     ];
   }
@@ -170,19 +190,23 @@
       bind:this={element}
     >
       {#each messages as message, i}
-        <ChatMessage
-          {profilePicMe}
-          {profilePicChatPartner}
-          message={message.message}
-          components={message.components}
-          componentsClass={message.componentClass}
-          timestamp={message.timestamp}
-          actor={message.actor}
-          prevActor={message.prevActor}
-          type={message.type}
-          explanation={message.explanation}
-          isLast={ i >= (messages.length-1)}
-        />
+        {#if message.type === "component"}
+          <ChatComponent components={message.components}/>
+        {:else}
+          <ChatMessage
+            {profilePicMe}
+            {profilePicChatPartner}
+            message={message.message}
+            components={message.components}
+            componentsClass={message.componentClass}
+            timestamp={message.timestamp}
+            actor={message.actor}
+            prevActor={message.prevActor}
+            type={message.type}
+            explanation={message.explanation}
+            isLast={i >= messages.length - 1}
+          />
+        {/if}
       {/each}
     </div>
   </div>

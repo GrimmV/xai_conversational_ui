@@ -11,6 +11,8 @@
   import ProgressBars from "../plots/ProgressBars.svelte";
   import TrustScoreVisualization from "../plots/TrustScoreVisualization.svelte";
   import SingleFeaturePlot from "../plots/SingleFeaturePlot.svelte";
+  import StackedColumn from "../plots/StackedColumn.svelte";
+  import FeatureRelevance from "../components/Interactives/FeatureRelevance.svelte";
 
   // Retrieve user store from context
   const data = getContext("data");
@@ -134,8 +136,8 @@
     />
   {:else if component === "learningCurve"}
     <MultiLinePlot data={getLearningCurves(dataParams)} {title} />
-  {:else if component === "shapGlobalImportance"}
-    <Column data={getShapGlobalImportance()} {title} />
+  {:else if component === "feature_relevance"}
+    <FeatureRelevance data={getShapGlobalImportance()} initialActiveClass="4"/>
   {:else if component === "statistics"}
     <FeatureStatistics
       data={getStatistics()}

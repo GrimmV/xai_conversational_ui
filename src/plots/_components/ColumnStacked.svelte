@@ -5,13 +5,16 @@
  <script>
   import { getContext } from 'svelte';
 
-  const { data, xGet, yGet, zGet, xScale } = getContext('LayerCake');
+  const { data, xGet, yGet, xScale, zRange } = getContext('LayerCake');
+
+  const colors = $zRange;
 </script>
 
 <g class="column-group">
   {#each $data as series, i}
-    {#each series as d}
+    {#each series as d, j}
       {@const yVals = $yGet(d)}
+      {@const colorFill = colors[i]}
       {@const columnHeight = yVals[0] - yVals[1]}
       <rect
         class='group-rect'
@@ -20,7 +23,7 @@
         y="{yVals[1]}"
         width={$xScale.bandwidth()}
         height="{columnHeight}"
-        fill={$zGet(series)}
+        fill={colorFill}
       ></rect>
     {/each}
   {/each}

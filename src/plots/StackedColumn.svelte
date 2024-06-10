@@ -12,22 +12,24 @@
   export let data;
   export let xKey;
 
-  const yKey = [0, 1];
-  const zKey = 'key';
+  console.log(data)
 
-  const seriesNames = Object.keys(data[0]).filter(d => d !== xKey);
-  const seriesColors = generateColorScale(data.length)
+  export let yKey = [0, 1];
+  const zKey = 'value';
 
-  data.forEach(d => {
+  $: seriesNames = Object.keys(data[0]).filter(d => d !== xKey);
+  let seriesColors = generateColorScale(data.length)
+
+  $: data.forEach(d => {
     seriesNames.forEach(name => {
       d[name] = +d[name];
     });
   });
 
-  const stackData = stack()
+  $: stackData = stack()
     .keys(seriesNames);
 
-  const series = stackData(data);
+  $: series = stackData(data);
 
   const formatLabelY = d => format(`~s`)(d);
 </script>
@@ -55,7 +57,7 @@
       y={yKey}
       z={zKey}
       xScale={scaleBand().paddingInner(0.028).round(true)}
-      xDomainSort={false}
+      xDomainSort={true}
       zScale={scaleOrdinal()}
       zDomain={seriesNames}
       zRange={seriesColors}
