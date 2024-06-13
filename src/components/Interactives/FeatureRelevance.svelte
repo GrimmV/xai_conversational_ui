@@ -5,10 +5,10 @@
   import SingleDropdown from "../BasicInteractions/SingleDropdown.svelte";
 
   export let data;
+  export let initialActiveClass = "5";
 
   let xKey = "feature";
 
-  export let initialActiveClass = "5";
   let activeClass = initialActiveClass;
   let myData = [];
   $: if (activeClass === "all") {
@@ -28,7 +28,6 @@
   <div class="flex gap-2 items-center">
     <Button on:click={handleReset}><i class="fa-solid fa-arrow-rotate-right mr-2" ></i>Reset</Button>
     <SingleDropdown items={[...allClasses, "all"]} bind:value={activeClass} title={"Class"} instruction={"Choose class"}/>
-    <p>Active class: {activeClass}</p>
   </div>
   <StackedColumn data={myData} {xKey} />
 </div>

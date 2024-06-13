@@ -1,33 +1,30 @@
 <script>
   import { getContext } from "svelte";
   import Textbox from "../components/Textbox.svelte";
-  import PredConfusionPlot from "../plots/PredConfusionPlot.svelte";
-  import MultiLinePlot from "../plots/MultiLinePlot.svelte";
-  import Column from "../plots/Column.svelte";
-  import FeatureStatistics from "../plots/FeatureStatistics.svelte";
-  import HistPlot from "../plots/HistPlot.svelte";
   import Scatter from "../plots/Scatter.svelte";
-  import DatapointTableAndShap from "../plots/DatapointTableAndShap.svelte";
   import ProgressBars from "../plots/ProgressBars.svelte";
   import TrustScoreVisualization from "../plots/TrustScoreVisualization.svelte";
   import SingleFeaturePlot from "../plots/SingleFeaturePlot.svelte";
-  import StackedColumn from "../plots/StackedColumn.svelte";
   import FeatureRelevance from "../components/Interactives/FeatureRelevance.svelte";
+  import ConfusionMatrix from "../components/Interactives/ConfusionMatrix.svelte";
+  import CorrelationMatrix from "../components/Interactives/CorrelationMatrix.svelte";
+  import LearningCurves from "../components/Interactives/LearningCurves.svelte";
+  import Statistics from "../components/Interactives/Statistics.svelte";
+  import { allFeatures } from "../config";
+  import Histogram from "../components/Interactives/Histogram.svelte";
+  import Datapoint from "../components/Interactives/Datapoint.svelte";
+  import Context from "../components/Interactives/Context.svelte";
 
   // Retrieve user store from context
   const data = getContext("data");
 
-  const getPredConfusionMatrices = ({ type }) =>
-    data.modelPerformance.confusion_matrices[type];
+  const getPredConfusionMatrices = () =>
+    data.modelPerformance.confusion_matrices;
   const getFeatureCorrelation = () => {
     return data.featureCorrelation;
   };
-  const getLearningCurves = ({ types }) => {
-    const learning_curves = [];
-    for (let type of types) {
-      learning_curves.push(data.modelPerformance.learning_curve[type]);
-    }
-    return learning_curves;
+  const getLearningCurves = () => {
+    return data.modelPerformance.learning_curve;
   };
   const getShapGlobalImportance = () => {
     return data.shapGlobalImportance;
@@ -42,11 +39,14 @@
   };
 
   const getDatapoint = () => {
-    return data.datapoint;
+    return data.datapoint.values.values;
   };
 
   const getPrediction = () => {
-    return data.singlePred;
+    return data.singlePred.values.prediction;
+  };
+  const getProbabilities = () => {
+    return data.singlePred.values.probs;
   };
 
   const getSingleShap = () => {
@@ -59,52 +59,6 @@
 
   const getAllDensity = () => {
     return data.allDensity;
-  };
-
-  function transformDensityData(featureKey, activeClass) {
-    const dataDictionary = {};
-
-    const densityData = data.density;
-
-    for (const [key, value] of Object.entries(densityData)) {
-      // Initialize an array for each class, if not already initialized
-      if (!dataDictionary[key]) {
-        dataDictionary[key] = [];
-      }
-
-      // Push the value of the specified feature for each entry into the array
-      value.forEach((entry) => {
-        if (entry[featureKey] !== undefined) {
-          dataDictionary[key].push(entry[featureKey]);
-        }
-      });
-    }
-
-    return dataDictionary[activeClass];
-  }
-  const getAnchorBound = (feature, key = "lower_bound") => {
-    const anchor_tmp = data.singleAnchor.anchor.find(
-      (v) => v.value === feature
-    );
-    if (!anchor_tmp) return null;
-    else return anchor_tmp[key];
-  };
-
-  const calcFeatureShap = (feature, activeClass) => {
-    return data.shaps.find((v) => {
-      return v.index === data.index && v.class.toString() === activeClass;
-    }).values[feature];
-  };
-
-  const calcClassShaps = (activeClass) =>
-    data.shaps
-      .filter((v) => v.class.toString() === activeClass)
-      .map((v) => v.values);
-
-  const calcPredictionIndexes = (activeClass) => {
-    return data.predictions.values
-      .filter((v) => v.prediction.toString() === activeClass)
-      .map((v) => v.index);
   };
 
   const getDatapointValue = (feature) => {
@@ -120,36 +74,37 @@
   export let dataParams = {};
 </script>
 
-<div>
+<div class="m-6">
   {#if component === "textbox"}
     <Textbox {dataParams} />
-  {:else if component === "predConfMatrix"}
-    <PredConfusionPlot
-      data={getPredConfusionMatrices(dataParams)}
-      props={{ xKey: "actual", yKey: "predicted", zKey: "count", title: title }}
-    />
-  {:else if component === "corrMatrix"}
-    <PredConfusionPlot
-      data={getFeatureCorrelation()}
-      props={{ xKey: "f1", yKey: "f2", zKey: "correlation", title: title }}
-      xLabelRotation={45}
-    />
-  {:else if component === "learningCurve"}
-    <MultiLinePlot data={getLearningCurves(dataParams)} {title} />
+  {:else if component === "confusion"}
+    <ConfusionMatrix data={getPredConfusionMatrices()} type={dataParams.type} />
+  {:else if component === "correlation"}
+    <CorrelationMatrix data={getFeatureCorrelation()} />
+  {:else if component === "learning_curve"}
+    <LearningCurves data={getLearningCurves()} types={dataParams.types} />
   {:else if component === "feature_relevance"}
-    <FeatureRelevance data={getShapGlobalImportance()} initialActiveClass="4"/>
-  {:else if component === "statistics"}
-    <FeatureStatistics
-      data={getStatistics()}
-      feature={dataParams.feature}
-      activeClass={dataParams.activeClass}
+    <FeatureRelevance
+      data={getShapGlobalImportance()}
+      initialActiveClass={dataParams.class}
     />
-  {:else if component === "featureDistribution"}
-    <HistPlot
-      {title}
-      transformData={transformDensityData}
+  {:else if component === "statistics"}
+    <Statistics
+      data={getStatistics()}
+      type={dataParams.type}
+      feature={dataParams.feature_list === "all"
+        ? allFeatures[0]
+        : dataParams.feature_list[0]}
+      activeClass={dataParams.class_list === "all"
+        ? "all"
+        : dataParams.class_list[0]}
+    />
+  {:else if component === "distribution"}
+    <Histogram
+      data={data.density}
       feature={dataParams.feature}
       activeClass={dataParams.activeClass}
+      kind={dataParams.kind}
     />
   {:else if component === "interactionScatter"}
     <Scatter
@@ -159,31 +114,32 @@
       yKey={dataParams.feature2}
       state={dataParams.class}
     />
-  {:else if component === "datapointAndShapTable"}
-    <DatapointTableAndShap
+  {:else if component === "datapoint"}
+    <Datapoint
       datapoint={getDatapoint()}
+      prediction={getPrediction()}      
       shapValues={getSingleShap().find(
-        (v) => v.class === getPrediction().values.prediction
-      )}
+        (v) => v.class === getPrediction()
+      ).values}
     />
-  {:else if component === "predictionProbabilities"}
-    <ProgressBars prediction={getPrediction()} />
+  {:else if component === "probabilities"}
+    <ProgressBars probabilities={getProbabilities()} />
   {:else if component === "trustscore"}
     <TrustScoreVisualization trustScoreData={getSingleTrustscore()} />
-  {:else if component === "featureContext"}
-    <SingleFeaturePlot
-      feature={dataParams.feature}
-      calcAnchorBound={getAnchorBound}
+  {:else if component === "context"}
+  <Context
       density={getAllDensity()}
-      calcClassShaps={calcClassShaps}
-      calcFeatureShap={calcFeatureShap}
-      calcPredictionIndexes={calcPredictionIndexes}
-      calcDatapointValue={getDatapointValue}
-      calcFeatureDataStats={getFeatureDataStats}
+      shapValues={data.shaps}
+      anchor={data.singleAnchor.anchor}
+      predictions={data.predictions}
+      index={data.index}
+      feature={dataParams.feature}
+      datapoints={data.datapointsTest}
+      featureStats={data.featureStats}
       activeClass={dataParams.activeClass}
       showDistribution={dataParams.showDistribution}
       showShapValue={dataParams.showShapValue}
       showPartialDependence={dataParams.showPartialDependence}
-    />
+  />
   {/if}
 </div>

@@ -12,8 +12,6 @@
   export let data;
   export let xKey;
 
-  console.log(data)
-
   export let yKey = [0, 1];
   const zKey = 'value';
 
@@ -67,6 +65,7 @@
       <Html>
         <AxisX
           gridlines={false}
+          rotation={45}
         />
         <AxisY
           ticks={4}

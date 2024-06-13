@@ -1,18 +1,16 @@
 <script>
   import TabNav from "../components/Navigation/TabNav.svelte";
-  import { allClasses, allFeatures } from "../config";
+  import { allFeatures } from "../config";
 
   export let data;
   export let feature;
   export let activeClass;
 
-  let selectedFeature = feature;
-
   function calculateAllMetric(metric) {
     let values = [];
     Object.keys(data).forEach((classKey) => {
-      if (data[classKey][selectedFeature] && data[classKey][selectedFeature][metric]) {
-        values.push(data[classKey][selectedFeature][metric]);
+      if (data[classKey][feature] && data[classKey][feature][metric]) {
+        values.push(data[classKey][feature][metric]);
       }
     });
     switch (metric) {
@@ -43,14 +41,14 @@
     <TabNav
       options={allFeatures}
       label="Focus Feature"
-      bind:selected={selectedFeature}
+      bind:selected={feature}
     />
   </div>
   <div class="w-full flex mr-24">
     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
       <table
         class="min-w-full divide-y divide-gray-200"
-        aria-label={`Statistics for ${selectedFeature}`}
+        aria-label={`Statistics for ${feature}`}
       >
         <thead class="bg-gray-50">
           <tr>
@@ -92,7 +90,10 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr class="hover:cursor-pointer hover:bg-muted">
+          <tr
+            class="hover:cursor-pointer hover:bg-muted"
+            class:bg-yellow-100={"all" === activeClass}
+          >
             <td
               class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
               >ALL</td
@@ -133,27 +134,27 @@
               >
               <td
                 class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
-                >{parseFloat(data[classKey][selectedFeature].count).toFixed(2)}</td
+                >{parseFloat(data[classKey][feature].count).toFixed(2)}</td
               >
               <td
                 class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
-                >{parseFloat(data[classKey][selectedFeature].max).toFixed(2)}</td
+                >{parseFloat(data[classKey][feature].max).toFixed(2)}</td
               >
               <td
                 class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
-                >{parseFloat(data[classKey][selectedFeature].mean).toFixed(2)}</td
+                >{parseFloat(data[classKey][feature].mean).toFixed(2)}</td
               >
               <td
                 class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
-                >{parseFloat(data[classKey][selectedFeature].median).toFixed(2)}</td
+                >{parseFloat(data[classKey][feature].median).toFixed(2)}</td
               >
               <td
                 class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
-                >{parseFloat(data[classKey][selectedFeature].min).toFixed(2)}</td
+                >{parseFloat(data[classKey][feature].min).toFixed(2)}</td
               >
               <td
                 class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
-                >{parseFloat(data[classKey][selectedFeature].std).toFixed(2)}</td
+                >{parseFloat(data[classKey][feature].std).toFixed(2)}</td
               >
             </tr>
           {/each}

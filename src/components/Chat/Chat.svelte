@@ -5,6 +5,7 @@
   import ChatMessage from "./ChatMessage.svelte";
   import { tick } from "svelte";
   import { onMount } from "svelte";
+  import ChatTransparency from "./ChatTransparency.svelte";
 
   let socket;
 
@@ -32,6 +33,17 @@
         sendSystemMessage(data.category, [], "", type, data.explanation);
       } else if (type === "data_choice") {
         sendSystemMessage(data.choice, [], "", type, data.explanation);
+        const components_formatted = [];
+        const json_choice = JSON.parse(data.choice)
+        console.log(json_choice)
+        for (let comp of Object.keys(json_choice)) {
+          components_formatted.push({
+            component: comp,
+            params: json_choice[comp],
+          });
+        }
+        sendSystemMessage("", components_formatted, "", "component", "", true);
+        console.log(components_formatted);
       } else if (type === "response") {
         sendSystemMessage(data.response, [], "", type, data.explanation);
         sendSystemMessage(data.next, [], "", "next");
@@ -85,18 +97,19 @@
     {
       messageId: 3,
       components: [
-        { component: "textbox", dataParams: { text: "Understand the data" } },
-        { component: "textbox", dataParams: { text: "Understand the model" } },
+        { component: "textbox", params: { text: "Understand the data" } },
+        { component: "textbox", params: { text: "Understand the model" } },
         {
           component: "textbox",
-          dataParams: { text: "Look into the prediction" },
+          params: { text: "Look into the prediction" },
         },
         {
           component: "textbox",
-          dataParams: { text: "Analyze the prediction context" },
+          params: { text: "Analyze the prediction context" },
         },
       ],
       componentClass: "flex m-2",
+      isHidden: false,
       timestamp: now,
       actor: "system",
       type: "component",
@@ -151,11 +164,11 @@
       requestField: userMessage,
     };
     // sendRequest(request);
-    sendSystemMessage("", [
-      {
-        "component": "feature_relevance"
-      }
-    ], "", "component")
+    const components_formatted = [{
+      component: "context",
+      params: {"activeClass": "5", "feature": "alcohol"}
+    }];
+    sendSystemMessage("", components_formatted, "", "component", "", true);
     userMessage = "";
   }
 
@@ -164,7 +177,8 @@
     components = [],
     componentClass = "",
     type = "info",
-    explanation = ""
+    explanation = "",
+    isHidden = false
   ) {
     messages = [
       ...messages,
@@ -178,6 +192,7 @@
         type: type,
         prevActor: messages[messages.length - 1].actor,
         explanation: explanation,
+        isHidden: isHidden
       },
     ];
   }
@@ -191,7 +206,9 @@
     >
       {#each messages as message, i}
         {#if message.type === "component"}
-          <ChatComponent components={message.components}/>
+          <ChatComponent components={message.components} isHidden={message.isHidden}/>
+        {:else if message.type === "routing" || message.type === "data_choice"}
+          <ChatTransparency type={message.type} input={message.message} explanation={message.explanation} />
         {:else}
           <ChatMessage
             {profilePicMe}

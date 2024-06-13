@@ -47,6 +47,18 @@ const config = {
 				card: {
 					DEFAULT: "hsl(var(--card) / <alpha-value>)",
 					foreground: "hsl(var(--card-foreground) / <alpha-value>)"
+				},
+				negative: {
+				  DEFAULT: "hsl(var(--negative) / <alpha-value>)",
+				  foreground: "hsl(var(--negative-foreground) / <alpha-value>)",
+				},
+				positive: {
+				  DEFAULT: "hsl(var(--positive) / <alpha-value>)",
+				  foreground: "hsl(var(--positive-foreground) / <alpha-value>)",
+				},
+				neutral: {
+				  DEFAULT: "hsl(var(--neutral) / <alpha-value>)",
+				  foreground: "hsl(var(--neutral-foreground) / <alpha-value>)",
 				}
 			},
 			borderRadius: {

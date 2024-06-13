@@ -12,6 +12,8 @@
   export let data;
   export let title;
 
+  console.log(data)
+
   const xKey = "n";
   const yKey = "score";
   const zKey = "type";

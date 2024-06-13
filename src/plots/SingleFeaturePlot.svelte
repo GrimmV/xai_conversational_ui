@@ -3,9 +3,6 @@
   import DistributionPlot from "../plots/DistributionPlot.svelte";
   import LineAreaPlot from "../plots/LineAreaPlot.svelte";
   import { extent } from "d3";
-  import { allClasses, allFeatures } from "../config";
-  import { Select } from "bits-ui";
-  import TabNav from "../components/Navigation/TabNav.svelte";
 
   export let feature;
   export let activeClass;
@@ -20,13 +17,16 @@
   export let showPartialDependence;
   export let showShapValue;
 
+  $: console.log(feature)
+  $: console.log(activeClass)
+
   $: movingAverageNumber = 50;
 
   const y_shap_pd = "shap_value";
   const x_shap_pd = "feature_value";
 
-  let selectedClass = activeClass;
-  let selectedFeature = feature;
+  $: selectedClass = activeClass;
+  $: selectedFeature = feature;
 
   $: lowerBound = calcAnchorBound(selectedFeature, "lower_bound");
   $: upperBound = calcAnchorBound(selectedFeature, "upper_bound");
@@ -35,9 +35,6 @@
   $: predictionIndexes = calcPredictionIndexes(selectedClass);
   $: dataValue = calcDatapointValue(selectedFeature);
   $: dataStats = calcFeatureDataStats(selectedFeature);
-
-  $: console.log(lowerBound);
-  $: console.log(upperBound);
 
   $: subdata = predictionIndexes
     .map((index) => density[index])
@@ -93,25 +90,9 @@
 
     return result;
   }
-
-  const updateFocusClass = () => {
-    console.log("updated");
-  };
 </script>
 
 <div class="p-8 m-2 bg-muted shadow rounded relative">
-  <div class="flex gap-2">
-    <TabNav
-      options={allClasses}
-      label="Focus Class"
-      bind:selected={selectedClass}
-    />
-    <TabNav
-      options={allFeatures}
-      label="Focus Feature"
-      bind:selected={selectedFeature}
-    />
-  </div>
   <div class="flex gap-4 mt-4">
     <div class="flex flex-col items-center h-auto w-64">
       <RangeBar {domain} {upperBound} {lowerBound} {dataValue} />

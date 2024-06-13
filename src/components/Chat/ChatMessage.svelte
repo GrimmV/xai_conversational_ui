@@ -23,9 +23,7 @@
 
 <div class="flex flex-col">
   {#if isStatus}
-    <div
-      class="min-w-min"
-    >
+    <div class="min-w-min">
       {#if actor !== prevActor}
         <div class="direct-chat-infos clearfix flex flex-col">
           <p class={sentByMe ? "self-end" : "self-start"}>
@@ -47,9 +45,10 @@
       {/if}
       <div class="w-fit m-auto p-2">
         <div class="d-flex">
-          <span class="mr-auto font-semibold">{message}
+          <span class="mr-auto font-semibold"
+            >{message}
             {#if isLast}
-              <i class="fa-solid fa-spinner animate-spin"/>
+              <i class="fa-solid fa-spinner animate-spin" />
             {/if}
           </span>
         </div>
