@@ -4,6 +4,7 @@
   export let datapoint;
   export let prediction;
   export let shapValues;
+  export let hideImpact;
 </script>
 
 <div class="flex flex-col gap-2">
@@ -12,5 +13,6 @@
     {datapoint}
     {prediction}
     {shapValues}
+    {hideImpact}
   />
 </div>

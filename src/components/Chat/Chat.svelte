@@ -34,8 +34,8 @@
       } else if (type === "data_choice") {
         sendSystemMessage(data.choice, [], "", type, data.explanation);
         const components_formatted = [];
-        const json_choice = JSON.parse(data.choice)
-        console.log(json_choice)
+        const json_choice = JSON.parse(data.choice);
+        console.log(json_choice);
         for (let comp of Object.keys(json_choice)) {
           components_formatted.push({
             component: comp,
@@ -87,6 +87,26 @@
     {
       messageId: 2,
       message:
+        "You are supposed to evaluate the following quality prediction from the machine learning model.",
+      timestamp: now,
+      actor: "system",
+      type: "info",
+      prevActor: "",
+      explanation: "",
+    },
+    {
+      messageId: 3,
+      components: [{ component: "datapoint", params: { hideImpact: true } }],
+      isHidden: false,
+      timestamp: now,
+      actor: "system",
+      type: "component",
+      prevActor: "system",
+      explanation: "",
+    },
+    {
+      messageId: 4,
+      message:
         "While you can ask me anything about the model behaviour and data, I recommend the following workflow: ",
       timestamp: now,
       actor: "system",
@@ -95,7 +115,7 @@
       explanation: "",
     },
     {
-      messageId: 3,
+      messageId: 5,
       components: [
         { component: "textbox", params: { text: "Understand the data" } },
         { component: "textbox", params: { text: "Understand the model" } },
@@ -117,7 +137,7 @@
       explanation: "",
     },
     {
-      messageId: 4,
+      messageId: 6,
       message: "What do you want to know or do?",
       timestamp: now,
       actor: "system",
@@ -163,12 +183,14 @@
     const request = {
       requestField: userMessage,
     };
-    // sendRequest(request);
-    const components_formatted = [{
-      component: "context",
-      params: {"activeClass": "5", "feature": "alcohol"}
-    }];
-    sendSystemMessage("", components_formatted, "", "component", "", true);
+    sendRequest(request);
+    // const components_formatted = [
+    //   {
+    //     component: "context",
+    //     params: { activeClass: "5", feature: "alcohol" },
+    //   },
+    // ];
+    // sendSystemMessage("", components_formatted, "", "component", "", true);
     userMessage = "";
   }
 
@@ -192,7 +214,7 @@
         type: type,
         prevActor: messages[messages.length - 1].actor,
         explanation: explanation,
-        isHidden: isHidden
+        isHidden: isHidden,
       },
     ];
   }
@@ -206,9 +228,16 @@
     >
       {#each messages as message, i}
         {#if message.type === "component"}
-          <ChatComponent components={message.components} isHidden={message.isHidden}/>
+          <ChatComponent
+            components={message.components}
+            isHidden={message.isHidden}
+          />
         {:else if message.type === "routing" || message.type === "data_choice"}
-          <ChatTransparency type={message.type} input={message.message} explanation={message.explanation} />
+          <ChatTransparency
+            type={message.type}
+            input={message.message}
+            explanation={message.explanation}
+          />
         {:else}
           <ChatMessage
             {profilePicMe}

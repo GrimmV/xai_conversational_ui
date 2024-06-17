@@ -5,6 +5,7 @@
   export let datapoint;
   export let prediction;
   export let shapValues;
+  export let hideImpact;
 
   let features = allFeatures;
   let label_name = "Quality rating";
@@ -37,7 +38,7 @@
           >
         {/each}
       </tr>
-      {#if shapValues}
+      {#if shapValues && !hideImpact}
         <tr>
           <td class="row-name">Impact</td>
           {#each features as feature}

@@ -121,6 +121,7 @@
       shapValues={getSingleShap().find(
         (v) => v.class === getPrediction()
       ).values}
+      hideImpact={dataParams.hideImpact}
     />
   {:else if component === "probabilities"}
     <ProgressBars probabilities={getProbabilities()} />
