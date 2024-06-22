@@ -46,6 +46,9 @@ export async function load({ params }) {
   const featureStatsRaw = await fetch(
     "http://localhost:5000/api/v1/data/feature_stats/full"
   );
+  const distributionRaw = await fetch(
+    "http://localhost:5001/api/v1/data/distribution/full"
+  );
 
   if (
     !modelPerformanceRaw.ok ||
@@ -62,7 +65,8 @@ export async function load({ params }) {
     !singleAnchorRaw.ok ||
     !allDensityRaw.ok ||
     !shapsRaw.ok ||
-    !featureStatsRaw.ok
+    !featureStatsRaw.ok ||
+    !distributionRaw.ok
   ) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -81,6 +85,7 @@ export async function load({ params }) {
   const allDensity = await allDensityRaw.json();
   const shaps = await shapsRaw.json();
   const featureStats = await featureStatsRaw.json();
+  const distribution = await distributionRaw.json();
   return {
     modelPerformance,
     featureCorrelation,
@@ -97,6 +102,7 @@ export async function load({ params }) {
     allDensity,
     shaps,
     featureStats,
+    distribution,
     index,
   };
 }

@@ -8,26 +8,23 @@
   import Annotations from "./_components/Annotations.svelte";
   import ArrowheadMarker from "./_components/ArrowheadMarker.svelte";
   import Arrows from "./_components/Arrows.svelte";
-  import { summarizeStructure } from "../utils";
 
   export let data = [];
   export let title = "";
 
-  console.log(data);
+  $: console.log(data);
 
   export let xKey = "feature";
   export let yKey = "shapSum";
-  export let order = "largeToSmall";
+  export let order = true;
 
   // Use a reactive declaration to sort data
   let sortedData = [];
   // Your sorted data as before
-  $: sortedData = [...data].sort((a, b) =>
-    order === "largeToSmall" ? b[yKey] - a[yKey] : a[yKey] - b[yKey]
-  );
+  $: sortedData = order
+    ? [...data].sort((a, b) => b[yKey] - a[yKey])
+    : [...data];
 
-  $: console.log(summarizeStructure(sortedData))
-  
   // Extract the featureNames in sorted order for the xScale domain
   $: sortedFeatureNames = sortedData.map((d) => d[xKey]);
 

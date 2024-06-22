@@ -28,6 +28,7 @@
     .keys(seriesNames);
 
   $: series = stackData(data);
+  $: console.log(series[series.length-1].map(v => v[1]).sort((a, b) => b - a))
 
   const formatLabelY = d => format(`~s`)(d);
 </script>

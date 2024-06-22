@@ -4,7 +4,6 @@
   import Scatter from "../plots/Scatter.svelte";
   import ProgressBars from "../plots/ProgressBars.svelte";
   import TrustScoreVisualization from "../plots/TrustScoreVisualization.svelte";
-  import SingleFeaturePlot from "../plots/SingleFeaturePlot.svelte";
   import FeatureRelevance from "../components/Interactives/FeatureRelevance.svelte";
   import ConfusionMatrix from "../components/Interactives/ConfusionMatrix.svelte";
   import CorrelationMatrix from "../components/Interactives/CorrelationMatrix.svelte";
@@ -77,13 +76,13 @@
 <div class="m-6">
   {#if component === "textbox"}
     <Textbox {dataParams} />
-  {:else if component === "confusion"}
+  {:else if component === "confusion matrix"}
     <ConfusionMatrix data={getPredConfusionMatrices()} type={dataParams.type} />
   {:else if component === "correlation"}
     <CorrelationMatrix data={getFeatureCorrelation()} />
-  {:else if component === "learning_curve"}
+  {:else if component === "learning curve"}
     <LearningCurves data={getLearningCurves()} types={dataParams.types} />
-  {:else if component === "feature_relevance"}
+  {:else if component === "feature relevance"}
     <FeatureRelevance
       data={getShapGlobalImportance()}
       initialActiveClass={dataParams.class}

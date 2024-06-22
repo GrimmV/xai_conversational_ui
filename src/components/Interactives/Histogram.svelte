@@ -3,11 +3,14 @@
   import { allClasses, allFeatures } from "../../config";
   import HistPlot from "../../plots/HistPlot.svelte";
   import SingleDropdown from "../BasicInteractions/SingleDropdown.svelte";
+  import { extent } from 'd3-array';
 
   export let data;
   export let feature = "alcohol";
   export let activeClass = "5";
   export let kind = "train";
+
+  console.log(data);
 
   let activeClassVar = activeClass;
   let featureVar = feature;
@@ -19,7 +22,7 @@
     kindVar = kind;
   };
 
-  function transformDensityData(featureKey, activeClass) {
+  function transformData(data, featureKey) {
     const dataDictionary = {};
 
     for (const [key, value] of Object.entries(data)) {
@@ -36,7 +39,7 @@
       });
     }
 
-    return dataDictionary[activeClass];
+    return dataDictionary;
   }
 </script>
 
@@ -64,9 +67,20 @@
       instruction={"Choose class"}
     />
   </div>
-  <HistPlot
-    transformData={transformDensityData}
-    feature={featureVar}
-    activeClass={activeClassVar}
+  <!-- <Column
+    data={data[featureVar]["bins"].map((v, i) => {
+      return {
+        value:
+          data[featureVar]["start"] + (i * data[featureVar]["bin_width"]) / 2,
+        height: v,
+      };
+    })}
+    xKey="value"
+    yKey="height"
+    order={false}
+  /> -->
+  <HistPlot 
+    data={transformData(data, featureVar)[activeClassVar]}
+    domain={extent(Object.values(transformData(data, featureVar)).flat())}
   />
 </div>

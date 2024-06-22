@@ -46,7 +46,8 @@
         console.log(components_formatted);
       } else if (type === "response") {
         sendSystemMessage(data.response, [], "", type, data.explanation);
-        sendSystemMessage(data.next, [], "", "next");
+      } else if (type === "next") {
+        sendSystemMessage(data.response, [], "", "response", data.explanation)
       } else {
         sendSystemMessage(data.text, [], "", "info");
       }
@@ -107,7 +108,7 @@
     {
       messageId: 4,
       message:
-        "While you can ask me anything about the model behaviour and data, I recommend the following workflow: ",
+        "While you can ask me anything about machine learning, XAI and the usecase at hand, I recommend the following workflow: ",
       timestamp: now,
       actor: "system",
       type: "info",

@@ -10,19 +10,16 @@
 
   import calcThresholds from "./_modules/calcThresholds.js";
 
-  export let transformData;
-  export let domain = [0, null];
+  export let data;
+  export let domain;
   export let title = "";
-  export let feature = "";
-  export let activeClass = "";
+
+  $: console.log(data)
 
   const f = format(".2f");
 
   const xKey = ["x0", "x1"];
   const yKey = "length";
-
-  $: data = transformData(feature, activeClass);
-  $: console.log(data)
 
   let binCount = 60;
 

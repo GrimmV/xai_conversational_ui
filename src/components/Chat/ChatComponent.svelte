@@ -1,5 +1,4 @@
 <script>
-  import * as Accordion from "$lib/components/ui/accordion/index.js";
   import ComponentConstructor from "../../planning/ComponentConstructor.svelte";
   import Hiding from "../Navigation/Hiding.svelte";
 
@@ -14,7 +13,7 @@
         {#each components as component}
           <ComponentConstructor
             dataParams={component.params}
-            component={component.component}
+            component={component.component.toLowerCase()}
           />
         {/each}
       </div>
@@ -24,7 +23,7 @@
       {#each components as component}
         <ComponentConstructor
           dataParams={component.params}
-          component={component.component}
+          component={component.component.toLowerCase()}
         />
       {/each}
     </div>
