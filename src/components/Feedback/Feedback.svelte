@@ -8,9 +8,6 @@
   
     export let datapoint;
     export let prediction;
-
-    console.log(datapoint)
-    console.log(prediction)
   
     let class_names = allClasses
     $: confirmed = false;

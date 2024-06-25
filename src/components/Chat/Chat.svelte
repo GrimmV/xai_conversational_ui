@@ -34,8 +34,7 @@
       } else if (type === "data_choice") {
         sendSystemMessage(data.choice, [], "", type, data.explanation);
         const components_formatted = [];
-        const json_choice = JSON.parse(data.choice);
-        console.log(json_choice);
+        const json_choice = data.choice;
         for (let comp of Object.keys(json_choice)) {
           components_formatted.push({
             component: comp,
@@ -43,7 +42,6 @@
           });
         }
         sendSystemMessage("", components_formatted, "", "component", "", true);
-        console.log(components_formatted);
       } else if (type === "response") {
         sendSystemMessage(data.response, [], "", type, data.explanation);
       } else if (type === "next") {

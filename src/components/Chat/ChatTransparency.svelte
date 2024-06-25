@@ -16,7 +16,7 @@
     title = "Chosen category: " + input;
   } else if (isDataChoice) {
     title = "Data chosen";
-    parsed_input = JSON.parse(input)
+    parsed_input = input
   }
 </script>
 

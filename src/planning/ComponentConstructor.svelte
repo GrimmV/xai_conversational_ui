@@ -77,11 +77,11 @@
   {#if component === "textbox"}
     <Textbox {dataParams} />
   {:else if component === "confusion matrix"}
-    <ConfusionMatrix data={getPredConfusionMatrices()} type={dataParams.type} />
+    <ConfusionMatrix data={getPredConfusionMatrices()} type={dataParams.kind} />
   {:else if component === "correlation"}
     <CorrelationMatrix data={getFeatureCorrelation()} />
   {:else if component === "learning curve"}
-    <LearningCurves data={getLearningCurves()} types={dataParams.types} />
+    <LearningCurves data={getLearningCurves()} types={dataParams.kinds} />
   {:else if component === "feature relevance"}
     <FeatureRelevance
       data={getShapGlobalImportance()}
