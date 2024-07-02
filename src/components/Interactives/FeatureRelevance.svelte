@@ -4,6 +4,7 @@
   import SpecializedColumn from "../../plots/SpecializedColumn.svelte";
   import SingleDropdown from "../BasicInteractions/SingleDropdown.svelte";
   import { extent } from "d3";
+  import DocPopover from "../documentation/DocPopover.svelte";
 
   export let data;
   export let initialActiveClass = "5";
@@ -41,7 +42,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex gap-2 items-center">
+  <div class="flex gap-2 items-center relative">
     <Button on:click={handleReset}
       ><i class="fa-solid fa-arrow-rotate-right mr-2"></i>Reset</Button
     >
@@ -51,6 +52,7 @@
       title={"Class"}
       instruction={"Choose class"}
     />
+    <DocPopover id={`Feature_Relevance_${activeClass}`}/>
   </div>
   <SpecializedColumn data={myData} {xKey} {yKey} featureOrder={sortedFeatureNames}/>
 </div>

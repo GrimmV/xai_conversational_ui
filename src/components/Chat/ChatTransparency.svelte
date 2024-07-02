@@ -1,10 +1,13 @@
 <script>
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Popover from "$lib/components/ui/popover";
+  import { hideInfo } from "../../store";
 
   export let type = "";
   export let input = "";
   export let explanation = "";
+
+  $: hide = $hideInfo;
 
   let title = "";
 
@@ -20,6 +23,7 @@
   }
 </script>
 
+{#if !hide}
 <div class="m-2 ml-10">
   <div class="w-fit m-auto p-2">
     <div class="d-flex">
@@ -72,6 +76,8 @@
     </div>
   </div>
 </div>
+  
+{/if}
 
 <style>
   table {

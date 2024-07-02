@@ -36,16 +36,25 @@
         const components_formatted = [];
         const json_choice = data.choice;
         for (let comp of Object.keys(json_choice)) {
-          components_formatted.push({
-            component: comp,
-            params: json_choice[comp],
-          });
+          if (Array.isArray(json_choice[comp])) {
+            for (let elem of json_choice[comp]) {
+              components_formatted.push({
+                component: comp,
+                params: elem,
+              });
+            }
+          } else {
+            components_formatted.push({
+              component: comp,
+              params: json_choice[comp],
+            });
+          }
         }
         sendSystemMessage("", components_formatted, "", "component", "", true);
       } else if (type === "response") {
         sendSystemMessage(data.response, [], "", type, data.explanation);
       } else if (type === "next") {
-        sendSystemMessage(data.response, [], "", "response", data.explanation)
+        sendSystemMessage(data.response, [], "", "response", data.explanation);
       } else {
         sendSystemMessage(data.text, [], "", "info");
       }
@@ -186,7 +195,7 @@
     // const components_formatted = [
     //   {
     //     component: "context",
-    //     params: { activeClass: "5", feature: "alcohol" },
+    //     params: { class: "5", feature: "alcohol" },
     //   },
     // ];
     // sendSystemMessage("", components_formatted, "", "component", "", true);
@@ -281,7 +290,7 @@
   .direct-chat-messages {
     -webkit-transform: translate(0, 0);
     transform: translate(0, 0);
-    height: 80vh;
+    height: 70vh;
     overflow: auto;
     padding: 10px;
     transition: -webkit-transform 0.5s ease-in-out;

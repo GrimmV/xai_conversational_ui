@@ -4,6 +4,7 @@
   import HistPlot from "../../plots/HistPlot.svelte";
   import SingleDropdown from "../BasicInteractions/SingleDropdown.svelte";
   import { extent } from 'd3-array';
+  import DocPopover from "../documentation/DocPopover.svelte";
 
   export let data;
   export let feature = "alcohol";
@@ -44,7 +45,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex gap-2 items-center">
+  <div class="flex gap-2 items-center relative">
     <Button on:click={handleReset}
       ><i class="fa-solid fa-arrow-rotate-right mr-2"></i>Reset</Button
     >
@@ -67,18 +68,7 @@
       instruction={"Choose class"}
     />
   </div>
-  <!-- <Column
-    data={data[featureVar]["bins"].map((v, i) => {
-      return {
-        value:
-          data[featureVar]["start"] + (i * data[featureVar]["bin_width"]) / 2,
-        height: v,
-      };
-    })}
-    xKey="value"
-    yKey="height"
-    order={false}
-  /> -->
+  <DocPopover id={`Histogram_${kindVar}_${featureVar}_${activeClassVar}`}/>
   <HistPlot 
     data={transformData(data, featureVar)[activeClassVar]}
     domain={extent(Object.values(transformData(data, featureVar)).flat())}

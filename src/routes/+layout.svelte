@@ -3,9 +3,14 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import "../app.pcss";
   import { documentation } from "../store";
+  import { hideInfo } from "../store";
+
+  const toggleHideInfo = () => {
+    hideInfo.update(isHidden => !isHidden);
+  };
 </script>
 
-<div class="max-w-[1200px] mx-auto">
+<div class="max-w-[1200px] mx-auto h-screen">
   <header class="flex flex-col justify-center items-center">
     <div class="flex gap-x-8 items-center">
       <h1>Conversational XAI System</h1>
@@ -27,6 +32,13 @@
           </div>
         </Drawer.Content>
       </Drawer.Root>
+      <Button on:click={toggleHideInfo}>
+        {#if $hideInfo}
+          <p>Show Transparency</p>
+        {:else}
+          <p>Hide Transparency</p>
+        {/if}
+      </Button>
     </div>
   </header>
   <div class="m-4">

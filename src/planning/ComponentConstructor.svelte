@@ -136,7 +136,7 @@
       feature={dataParams.feature}
       datapoints={data.datapointsTest}
       featureStats={data.featureStats}
-      activeClass={dataParams.activeClass}
+      activeClass={dataParams.class}
       showDistribution={dataParams.showDistribution}
       showShapValue={dataParams.showShapValue}
       showPartialDependence={dataParams.showPartialDependence}

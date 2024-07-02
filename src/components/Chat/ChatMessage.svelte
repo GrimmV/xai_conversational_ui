@@ -1,8 +1,8 @@
 <script>
-  import ComponentConstructor from "../../planning/ComponentConstructor.svelte";
 
   import * as Popover from "$lib/components/ui/popover/index.js";
   import Button from "$lib/components/ui/button/button.svelte";
+  import { hideInfo } from "../../store";
 
   export let actor;
   export let profilePicChatPartner;
@@ -90,7 +90,7 @@
           <div class="d-flex">
             <div class="flex flex-col gap-y-2">
               <span class="mr-auto">{message}</span>
-              {#if explanation}
+              {#if explanation && !$hideInfo}
                 <div class="flex items-center gap-x-2">
                   <Popover.Root>
                     <Popover.Trigger asChild let:builder>
@@ -183,12 +183,5 @@
 
   .direct-chat-infos {
     font-size: 0.8rem;
-  }
-  .direct-chat-timestamp {
-    margin-left: 50px;
-    margin-right: 50px;
-    color: #999;
-
-    margin-bottom: 0;
   }
 </style>

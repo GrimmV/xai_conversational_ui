@@ -3,6 +3,7 @@
   import { allClasses, allFeatures } from "../../config";
   import FeatureStatistics from "../../plots/FeatureStatistics.svelte";
   import SingleDropdown from "../BasicInteractions/SingleDropdown.svelte";
+  import DocPopover from "../documentation/DocPopover.svelte";
 
   export let data;
   export let type = "train";
@@ -21,7 +22,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex gap-2 items-center">
+  <div class="flex gap-2 items-center relative">
     <Button on:click={handleReset}
       ><i class="fa-solid fa-arrow-rotate-right mr-2"></i>Reset</Button
     >
@@ -43,6 +44,7 @@
       title={"Focus Class"}
       instruction={"Choose class"}
     />
+    <DocPopover id={`Statistics_${chosenType}_${chosenFeature}_${chosenClass}`}/>
   </div>
   <FeatureStatistics {data} feature={chosenFeature} activeClass={chosenClass} />
 </div>

@@ -3,7 +3,7 @@
   import { allClasses, allFeatures } from "../../config";
   import SingleFeaturePlot from "../../plots/SingleFeaturePlot.svelte";
   import SingleDropdown from "../BasicInteractions/SingleDropdown.svelte";
-  import Toggler from "../BasicInteractions/Toggler.svelte";
+  import DocPopover from "../documentation/DocPopover.svelte";
 
   export let density;
   export let shapValues;
@@ -18,8 +18,10 @@
   export let showShapValue = true;
   export let showPartialDependence = true;
 
-  let activeFeature = feature;
-  let tmpActiveClass = activeClass;
+  console.log(shapValues)
+
+  let activeFeature = feature === "auto" ? "alcohol" : feature; 
+  let tmpActiveClass = activeClass === "auto" ? "5" : activeClass;
 
   const getAnchorBound = (feature, key = "lower_bound") => {
     const anchor_tmp = anchor.find((v) => v.value === feature);
@@ -59,7 +61,7 @@
 
 <div class="flex flex-col gap-2">
   <div class="flex flex-col gap-2">
-    <div class="flex gap-2">
+    <div class="flex gap-2 relative">
       <Button on:click={handleReset}
         ><i class="fa-solid fa-arrow-rotate-right mr-2"></i>Reset</Button
       >
@@ -75,15 +77,8 @@
         title={"Feature"}
         instruction={"Choose feature"}
       />
+      <DocPopover id={`Context_${tmpActiveClass}_${activeFeature}`}/>
     </div>
-    <!-- <div class="flex gap-2">
-      <Toggler text={"Show distribution"} bind:isToggled={showDistribution} />
-      <Toggler text={"Show impact"} bind:isToggled={showShapValue} />
-      <Toggler
-        text={"Show partial dependence"}
-        bind:isToggled={showPartialDependence}
-      />
-    </div> -->
   </div>
   <SingleFeaturePlot
     feature={activeFeature}
