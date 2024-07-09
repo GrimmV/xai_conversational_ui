@@ -10,10 +10,6 @@
     export let title = "";
     export let featureOrder = [];
     export let yDomain = [0, null];
-
-    console.log(data)
-    console.log(featureOrder)
-    console.log(yDomain)
   
     export let xKey = "feature";
     export let yKey = "value";

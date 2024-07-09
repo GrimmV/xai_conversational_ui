@@ -3,7 +3,6 @@
   import { allClasses } from "../../config";
   import SpecializedColumn from "../../plots/SpecializedColumn.svelte";
   import SingleDropdown from "../BasicInteractions/SingleDropdown.svelte";
-  import { extent } from "d3";
   import DocPopover from "../documentation/DocPopover.svelte";
 
   export let data;
