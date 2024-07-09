@@ -137,9 +137,6 @@
       datapoints={data.datapointsTest}
       featureStats={data.featureStats}
       activeClass={dataParams.class}
-      showDistribution={dataParams.showDistribution}
-      showShapValue={dataParams.showShapValue}
-      showPartialDependence={dataParams.showPartialDependence}
   />
   {/if}
 </div>

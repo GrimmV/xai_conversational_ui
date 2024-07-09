@@ -1,5 +1,4 @@
 <script>
-
   import * as Popover from "$lib/components/ui/popover/index.js";
   import Button from "$lib/components/ui/button/button.svelte";
   import { hideInfo } from "../../store";
@@ -8,8 +7,6 @@
   export let profilePicChatPartner;
   export let profilePicMe;
   export let message;
-  export let components = [];
-  export let componentsClass = "";
   export let timestamp;
   export let type;
   export let prevActor;
@@ -90,7 +87,7 @@
           <div class="d-flex">
             <div class="flex flex-col gap-y-2">
               <span class="mr-auto">{message}</span>
-              {#if explanation && !$hideInfo}
+              {#if explanation && !(type === "response") && !$hideInfo}
                 <div class="flex items-center gap-x-2">
                   <Popover.Root>
                     <Popover.Trigger asChild let:builder>
@@ -105,6 +102,8 @@
                     </Popover.Content>
                   </Popover.Root>
                 </div>
+              {:else}
+                <blockquote>{explanation}</blockquote>
               {/if}
             </div>
           </div>

@@ -1,11 +1,10 @@
 <script>
   import Button from "$lib/components/ui/button/button.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
-  import ChatComponent from "./ChatComponent.svelte";
-  import ChatMessage from "./ChatMessage.svelte";
   import { tick } from "svelte";
   import { onMount } from "svelte";
-  import ChatTransparency from "./ChatTransparency.svelte";
+  import Submessage from "./Submessage.svelte";
+  import Thread from "./Thread.svelte";
 
   let socket;
 
@@ -26,13 +25,28 @@
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      const threadId = data.thread_id;
       const type = data.type;
       if (type === "status") {
-        sendSystemMessage(data.text, [], "", type);
+        sendSystemMessage(data.text, [], "", type, threadId);
       } else if (type === "routing") {
-        sendSystemMessage(data.category, [], "", type, data.explanation);
+        sendSystemMessage(
+          data.category,
+          [],
+          "",
+          type,
+          threadId,
+          data.explanation
+        );
       } else if (type === "data_choice") {
-        sendSystemMessage(data.choice, [], "", type, data.explanation);
+        sendSystemMessage(
+          data.choice,
+          [],
+          "",
+          type,
+          threadId,
+          data.explanation
+        );
         const components_formatted = [];
         const json_choice = data.choice;
         for (let comp of Object.keys(json_choice)) {
@@ -50,13 +64,27 @@
             });
           }
         }
-        sendSystemMessage("", components_formatted, "", "component", "", true);
+        sendSystemMessage("", components_formatted, "", "component", threadId);
       } else if (type === "response") {
-        sendSystemMessage(data.response, [], "", type, data.explanation);
+        sendSystemMessage(
+          data.response,
+          [],
+          "",
+          type,
+          threadId,
+          data.explanation
+        );
       } else if (type === "next") {
-        sendSystemMessage(data.response, [], "", "response", data.explanation);
+        sendSystemMessage(
+          data.response,
+          [],
+          "",
+          "response",
+          threadId,
+          data.explanation
+        );
       } else {
-        sendSystemMessage(data.text, [], "", "info");
+        sendSystemMessage(data.text, [], "", "info", threadId);
       }
     };
 
@@ -64,7 +92,8 @@
       console.error("WebSocket error:", error);
     };
 
-    socket.onclose = () => {
+    socket.onclose = (ev) => {
+      console.log(ev);
       console.log("WebSocket connection closed");
     };
 
@@ -72,12 +101,6 @@
       socket.close();
     };
   });
-
-  let profilePicMe =
-    "https://p0.pikist.com/photos/474/706/boy-portrait-outdoors-facial-men-s-young-t-shirt-hair-person-thumbnail.jpg";
-
-  let profilePicChatPartner =
-    "https://storage.needpix.com/rsynced_images/male-teacher-cartoon.jpg";
 
   let now = Date.now();
 
@@ -89,6 +112,7 @@
       timestamp: now,
       actor: "system",
       type: "info",
+      category: "",
       prevActor: "",
       explanation: "",
     },
@@ -99,6 +123,7 @@
       timestamp: now,
       actor: "system",
       type: "info",
+      category: "",
       prevActor: "",
       explanation: "",
     },
@@ -109,6 +134,7 @@
       timestamp: now,
       actor: "system",
       type: "component",
+      category: "",
       prevActor: "system",
       explanation: "",
     },
@@ -119,6 +145,7 @@
       timestamp: now,
       actor: "system",
       type: "info",
+      category: "",
       prevActor: "system",
       explanation: "",
     },
@@ -136,11 +163,11 @@
           params: { text: "Analyze the prediction context" },
         },
       ],
-      componentClass: "flex m-2",
       isHidden: false,
       timestamp: now,
       actor: "system",
       type: "component",
+      category: "",
       prevActor: "system",
       explanation: "",
     },
@@ -150,6 +177,7 @@
       timestamp: now,
       actor: "system",
       type: "info",
+      category: "",
       prevActor: "system",
       explanation: "",
     },
@@ -161,7 +189,6 @@
   let element;
 
   const scrollToBottom = async (node) => {
-    console.log(node.scrollHeight);
     node.scroll({ top: node.scrollHeight, behavior: "smooth" });
   };
 
@@ -176,6 +203,12 @@
   }
 
   function sendUserMessage() {
+    const request = {
+      requestField: userMessage,
+      thread_id: null,
+      last_message_id: messages[messages.length - 1].messageId,
+    };
+    sendRequest(request);
     messages = [
       ...messages,
       {
@@ -184,14 +217,11 @@
         timestamp: Date.now(),
         actor: "user",
         type: "",
+        category: "",
         prevActor: "",
         explanation: "",
       },
     ];
-    const request = {
-      requestField: userMessage,
-    };
-    sendRequest(request);
     // const components_formatted = [
     //   {
     //     component: "context",
@@ -202,30 +232,94 @@
     userMessage = "";
   }
 
+  function sendThreadedSystemMessage(
+    message,
+    components = [],
+    category = "",
+    type = "info",
+    explanation = "",
+    isHidden = false,
+    threadId = ""
+  ) {
+    console.log(threadId)
+    const thread_message = messages.find((v) => v.messageId === parseInt(threadId));
+    const messageIndex = messages.findIndex((v) => v.messageId === parseInt(threadId));
+    console.log(thread_message)
+    if (thread_message) {
+      let submessages = thread_message.submessages;
+      if (submessages) {
+        thread_message.submessages.push({
+          messageId: submessages[submessages.length - 1].messageId + 1,
+          message: message,
+          components: components,
+          timestamp: Date.now(),
+          actor: "system",
+          category: category,
+          type: type,
+          prevActor: submessages[submessages.length - 1].actor,
+          explanation: explanation,
+          isHidden: isHidden,
+        });
+      } else {
+        thread_message.submessages = [
+          {
+            messageId: 0,
+            message: message,
+            components: components,
+            timestamp: Date.now(),
+            actor: "system",
+            category: category,
+            type: type,
+            prevActor: "system",
+            explanation: explanation,
+            isHidden: isHidden,
+          },
+        ];
+      }
+      messages[messageIndex] = thread_message;
+      console.log(messages)
+    }
+  }
+
   function sendSystemMessage(
     message,
     components = [],
-    componentClass = "",
+    category = "",
     type = "info",
+    threadId = null,
     explanation = "",
     isHidden = false
   ) {
-    messages = [
-      ...messages,
-      {
-        messageId: messages[messages.length - 1].messageId + 1,
-        message: message,
-        components: components,
-        componentClass: componentClass,
-        timestamp: Date.now(),
-        actor: "system",
-        type: type,
-        prevActor: messages[messages.length - 1].actor,
-        explanation: explanation,
-        isHidden: isHidden,
-      },
-    ];
+    if (!threadId) {
+      messages = [
+        ...messages,
+        {
+          messageId: messages[messages.length - 1].messageId + 1,
+          message: message,
+          components: components,
+          timestamp: Date.now(),
+          actor: "system",
+          category: category,
+          type: type,
+          prevActor: messages[messages.length - 1].actor,
+          explanation: explanation,
+          isHidden: isHidden,
+        },
+      ];
+    } else {
+      sendThreadedSystemMessage(
+        message,
+        components,
+        category,
+        type,
+        explanation,
+        isHidden,
+        threadId
+      );
+    }
   }
+
+  $: console.log(messages[messages.length - 1]);
 </script>
 
 <div class="direct-chat direct-chat-danger">
@@ -235,31 +329,10 @@
       bind:this={element}
     >
       {#each messages as message, i}
-        {#if message.type === "component"}
-          <ChatComponent
-            components={message.components}
-            isHidden={message.isHidden}
-          />
-        {:else if message.type === "routing" || message.type === "data_choice"}
-          <ChatTransparency
-            type={message.type}
-            input={message.message}
-            explanation={message.explanation}
-          />
+        {#if !message.submessages || message.submessages.length === 0}
+          <Submessage {message} isLast={i >= messages.length - 1} />
         {:else}
-          <ChatMessage
-            {profilePicMe}
-            {profilePicChatPartner}
-            message={message.message}
-            components={message.components}
-            componentsClass={message.componentClass}
-            timestamp={message.timestamp}
-            actor={message.actor}
-            prevActor={message.prevActor}
-            type={message.type}
-            explanation={message.explanation}
-            isLast={i >= messages.length - 1}
-          />
+          <Thread {message} {sendRequest} />
         {/if}
       {/each}
     </div>
